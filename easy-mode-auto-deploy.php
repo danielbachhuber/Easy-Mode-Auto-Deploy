@@ -18,10 +18,45 @@ class Easy_Mode_Auto_Deploy {
 
 		if ( ! isset( self::$instance ) ) {
 			self::$instance = new Easy_Mode_Auto_Deploy;
+			self::$instance->setup_actions();
 		}
 
 		return self::$instance;
 
+	}
+
+	private function setup_actions() {
+
+		if ( defined( 'EASY_MODE_AUTO_DEPLOY_SECRET' )
+			&& ! empty( $_GET['easy-mode-auto-deploy'] )
+			&& $_GET['easy-mode-auto-deploy'] === EASY_MODE_AUTO_DEPLOY_SECRET ) {
+
+			$this->deploy();
+
+		} else if ( is_admin() && ! defined( 'EASY_MODE_AUTO_DEPLOY_SECRET' ) ) {
+
+			add_action( 'admin_notices', array( $this, 'action_admin_notices' ) );
+
+		}
+
+	}
+
+	/**
+	 * Deploy the site
+	 */
+	private function deploy() {
+
+		// @todo
+
+	}
+
+	/**
+	 * Throw an error if the secret isn't defined
+	 */
+	public function action_admin_notices() {
+		?>
+		<div class="message error"><?php _e( "Easy Mode Auto Deploys is active, but the secret hasn't been set. See readme for more configuration details.", 'easy-mode-auto-deploy' ); ?></div>
+		<?php
 	}
 
 }
@@ -32,4 +67,4 @@ class Easy_Mode_Auto_Deploy {
 function Easy_Mode_Auto_Deploy() {
 	return Easy_Mode_Auto_Deploy::get_instance();
 }
-add_action( 'plugins_loaded', 'Easy_Mode_Auto_Deploy' );
+add_action( 'init', 'Easy_Mode_Auto_Deploy' );
