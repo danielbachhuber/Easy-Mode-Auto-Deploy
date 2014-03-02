@@ -43,10 +43,25 @@ class Easy_Mode_Auto_Deploy {
 
 	/**
 	 * Deploy the site
+	 * 
+	 * @todo support for custom deploy callback
+	 * @todo support for alternative origins and branches
+	 * @todo Support for subversion (maybe)
 	 */
 	private function deploy() {
 
-		// @todo
+		// WordPress installed in main directory vs. subdirectory
+		if ( file_exists( ABSPATH . '/wp-config.php' ) ) {
+			$webroot = ABSPATH;
+		} else if ( file_exists( dirname( ABSPATH ) . '/wp-config.php' ) ) {
+			$webroot = dirname( ABSPATH );
+		} else {
+			wp_die( __( "Couldn't find WordPress webroot", 'easy-mode-auto-deploy' ) );
+		}
+
+		shell_exec( "cd $webroot; git checkout -f master; git fetch origin --tags; git pull origin master; git submodule update --init --recursive" );
+
+		wp_die( __( 'Site deployed.', 'easy-mode-auto-deploy' ) );
 
 	}
 
